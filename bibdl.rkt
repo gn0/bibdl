@@ -190,17 +190,17 @@
 
 (define (journal->abbrev journal)
   (cond
-    [(journal-qje? journal) "qje"]
-    [(journal-aer? journal) "aer"]
-    [(journal-aeri? journal) "aeri"]
-    [(journal-ecta? journal) "ecta"]
+    [(journal-qje?    journal) "qje"]
+    [(journal-aer?    journal) "aer"]
+    [(journal-aeri?   journal) "aeri"]
+    [(journal-ecta?   journal) "ecta"]
     [(journal-restud? journal) "restud"]
     [(journal-restat? journal) "restat"]
     [(journal-aejapp? journal) "aejapp"]
     [(journal-aejpol? journal) "aejpol"]
     [(journal-aejmic? journal) "aejmic"]
     [(journal-aejmac? journal) "aejmac"]
-    [else (get-initials journal)]))
+    [else                      (get-initials journal)]))
 
 (define (bib->bib-id content)
   (let ([match (regexp-match #rx"{([^,]+)," content)])
@@ -235,10 +235,10 @@
 
 (define (url->fetcher url)
   (cond
-    [(aeaweb-url? url) fetch-aeaweb]
+    [(aeaweb-url?      url) fetch-aeaweb]
     [(cambridgeup-url? url) fetch-cambridgeup]
-    [(oxfordup-url? url) fetch-oxfordup]
-    [else (error 'unrecognized-url)]))
+    [(oxfordup-url?    url) fetch-oxfordup]
+    [else                   (error 'unrecognized-url)]))
 
 (define (same-content? a b)
   (eq? (string-trim a "\n")
