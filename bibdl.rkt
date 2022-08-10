@@ -14,7 +14,7 @@
                    "\n")
    "\n"))
 
-(define (fetch-url url)
+(define (download-url url)
   (clean-content
    (port->string
     (get-pure-port
@@ -34,11 +34,11 @@
 
 (define (fetch-aeaweb url)
   (let ([doi (aeaweb-url->doi url)])
-    (fetch-url (string-append
-                "https://www.aeaweb.org/articles/citation-export"
-                "?args%5Bformat%5D=bib"
-                "&args%5Bdoi%5D=" (string-replace doi "/" "%2F")
-                "&args%5Btype%5D=txt"))))
+    (download-url (string-append
+                   "https://www.aeaweb.org/articles/citation-export"
+                   "?args%5Bformat%5D=bib"
+                   "&args%5Bdoi%5D=" (string-replace doi "/" "%2F")
+                   "&args%5Btype%5D=txt"))))
 
 ;; Cambridge University Press journals.  Example URL:
 ;;
@@ -56,7 +56,7 @@
 
 (define (fetch-cambridgeup url)
   (let ([id (cambridgeup-url->id url)])
-    (fetch-url
+    (download-url
      (string-append
       "https://www.cambridge.org/core/services/aop-easybib/export"
       "?exportType=bibtex&productIds=" id
@@ -211,7 +211,7 @@
     (write-string content handle)
     (close-output-port handle)))
 
-(define (url-to-fetcher url)
+(define (url->fetcher url)
   (cond
     [(aeaweb-url? url) fetch-aeaweb]
     [(cambridgeup-url? url) fetch-cambridgeup]
@@ -226,7 +226,7 @@
       (displayln "Usage: bibdl <url>")
       (let* ([url (car args)]
              [bib-content (update-bib-id
-                           ((url-to-fetcher url) url))]
+                           ((url->fetcher url) url))]
              [bib-id (bib->bib-id bib-content)]
              [output-filename (string-append bib-id ".bib")])
         (if (file-exists? output-filename)
