@@ -62,6 +62,28 @@
       "?exportType=bibtex&productIds=" id
       "&citationStyle=bibtex"))))
 
+;; Oxford University Press journals.  Example URL:
+;;
+;; https://academic.oup.com/qje/article-abstract/114/3/739/1848099?redirectedFrom=fulltext
+;;
+
+(define (oxfordup-url? url)
+  (regexp-match?
+   #rx"^https?://academic[.]oup[.]com/[^/]+/[^/]+/[0-9]+/"
+   url))
+
+(define (oxfordup-url->id url)
+  (let ([match (regexp-match #rx"/([0-9]+)($|[?])" url)])
+    (cadr match)))
+
+(define (fetch-oxfordup url)
+  (let ([id (oxfordup-url->id url)])
+    (download-url
+     (string-append "https://academic.oup.com/Citation/Download"
+                    "?resourceId=" id
+                    "&resourceType=3"
+                    "&citationFormat=2"))))
+
 ;;
 ;; Functions to manipulate bibliography entries.
 ;;
@@ -215,6 +237,7 @@
   (cond
     [(aeaweb-url? url) fetch-aeaweb]
     [(cambridgeup-url? url) fetch-cambridgeup]
+    [(oxfordup-url? url) fetch-oxfordup]
     [else (error 'unrecognized-url)]))
 
 (define (same-content? a b)
