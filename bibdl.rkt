@@ -9,9 +9,8 @@
 
 (define (clean-content content)
   (string-append
-   (string-replace (string-trim content)
-                   "\r\n"
-                   "\n")
+   (string-trim
+    (string-replace content "\r\n" "\n"))
    "\n"))
 
 (define (download-url url)
@@ -241,8 +240,8 @@
     [else                   (error 'unrecognized-url)]))
 
 (define (same-content? a b)
-  (eq? (string-trim a "\n")
-       (string-trim b "\n")))
+  (string=? (string-trim a "\n")
+            (string-trim b "\n")))
 
 (define (main args)
   (if (or (not (= (length args) 1))
@@ -256,9 +255,6 @@
         (if (file-exists? output-filename)
             (let ([file-content (file->string output-filename)])
               (if (same-content? file-content bib-content)
-                  ;; FIXME Even when file-content and bib-content are
-                  ;;       the same, we don't end up in this branch.
-                  ;;       Why?
                   (printf "Already downloaded this.  See '~a'.\n"
                           output-filename)
                   (begin
