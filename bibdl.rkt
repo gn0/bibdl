@@ -222,7 +222,8 @@
        (string-trim b "\n")))
 
 (define (main args)
-  (if (not (= (length args) 1))
+  (if (or (not (= (length args) 1))
+          (member (car args) '("--help" "-h")))
       (displayln "Usage: bibdl <url>")
       (let* ([url (car args)]
              [bib-content (update-bib-id
