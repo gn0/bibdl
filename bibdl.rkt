@@ -40,6 +40,28 @@
                 "&args%5Bdoi%5D=" (string-replace doi "/" "%2F")
                 "&args%5Btype%5D=txt"))))
 
+;; Cambridge University Press journals.  Example URL:
+;;
+;; https://www.cambridge.org/core/journals/american-political-science-review/article/abs/using-a-probabilistic-model-to-assist-merging-of-largescale-administrative-records/DB2955F64A1F4E262C5B9B26C6D7552E
+;;
+
+(define (cambridgeup-url? url)
+  (regexp-match?
+   #rx"^https?://www[.]cambridge[.]org/core/journals/[^/]+/article/"
+   url))
+
+(define (cambridgeup-url->id url)
+  (let ([match (regexp-match #px"/([0-9A-F]{32})" url)])
+    (cadr match)))
+
+(define (fetch-cambridgeup url)
+  (let ([id (cambridgeup-url->id url)])
+    (fetch-url
+     (string-append
+      "https://www.cambridge.org/core/services/aop-easybib/export"
+      "?exportType=bibtex&productIds=" id
+      "&citationStyle=bibtex"))))
+
 ;;
 ;; Functions to manipulate bibliography entries.
 ;;
@@ -192,6 +214,7 @@
 (define (url-to-fetcher url)
   (cond
     [(aeaweb-url? url) fetch-aeaweb]
+    [(cambridgeup-url? url) fetch-cambridgeup]
     [else (error 'unrecognized-url)]))
 
 (define (same-content? a b)
