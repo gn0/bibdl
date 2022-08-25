@@ -61,6 +61,25 @@
       "?exportType=bibtex&productIds=" id
       "&citationStyle=bibtex"))))
 
+;; JSTOR journals.  Example URL:
+;;
+;; https://www.jstor.org/stable/3598804#metadata_info_tab_contents
+;;
+
+(define (jstor-url? url)
+  (regexp-match?
+   #rx"^https?://www[.]jstor[.]org/stable/[1-9][0-9]*"
+   url))
+
+(define (jstor-url->id url)
+  (let ([match (regexp-match #px"/([1-9][0-9]*)" url)])
+    (cadr match)))
+
+(define (fetch-jstor url)
+  (let ([id (jstor-url->id url)])
+    (download-url
+     (string-append "https://www.jstor.org/citation/text/" id))))
+
 ;; Oxford University Press journals.  Example URL:
 ;;
 ;; https://academic.oup.com/qje/article-abstract/114/3/739/1848099?redirectedFrom=fulltext
@@ -96,7 +115,7 @@
      (string-join (map first-letter words) ""))))
 
 (define (bib->year content)
-  (let ([match (regexp-match #rx"(?i:year) *=[{\" ]*([0-9]+)[}\" ]*,"
+  (let ([match (regexp-match #rx"(?i:year) *=[{\" ]*([0-9]+)[}\" ]*"
                              content)])
     (if (not match)
         (error 'bib->year-parse-error)
@@ -236,6 +255,7 @@
   (cond
     [(aeaweb-url?      url) fetch-aeaweb]
     [(cambridgeup-url? url) fetch-cambridgeup]
+    [(jstor-url?       url) fetch-jstor]
     [(oxfordup-url?    url) fetch-oxfordup]
     [else                   (error 'unrecognized-url)]))
 
