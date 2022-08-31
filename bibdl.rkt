@@ -147,7 +147,10 @@
 (define (authors->abbrev authors)
   (cond
     [(empty? authors) #f]
-    [(= (length authors) 1) (string-downcase (caar authors))]
+    [(= (length authors) 1) (string-downcase
+                             (regexp-replace* #rx"[- ]+"
+                                              (caar authors)
+                                              ""))]
     [(> (length authors) 1) (get-initials
                              (string-join (map car authors)))]))
 
