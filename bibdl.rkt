@@ -206,6 +206,9 @@
    #rx"(?i:american economic journal: macroeconomics)"
    journal))
 
+(define (journal-jae? journal)
+  (regexp-match-exact? #rx"(?i:journal of african economies)" journal))
+
 (define (journal->abbrev journal)
   (cond
     [(journal-qje?    journal) "qje"]
@@ -218,6 +221,7 @@
     [(journal-aejpol? journal) "aejpol"]
     [(journal-aejmic? journal) "aejmic"]
     [(journal-aejmac? journal) "aejmac"]
+    [(journal-jae?    journal) "jae"]
     [else                      (get-initials journal)]))
 
 (define (bib->bib-id content)
