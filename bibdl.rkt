@@ -80,6 +80,26 @@
     (download-url
      (string-append "https://www.jstor.org/citation/text/" id))))
 
+;; NBER working papers.  Example URL:
+;;
+;; https://www.nber.org/papers/w30423#fromrss
+;;
+
+(define (nber-url? url)
+  (regexp-match?
+   #rx"^https?://www[.]nber[.]org/papers/w[0-9]+"
+   url))
+
+(define (nber-url->id url)
+  (let ([match (regexp-match #rx"papers/w([0-9]+)($|[?#])" url)])
+    (cadr match)))
+
+(define (fetch-nber url)
+  (let ([id (nber-url->id url)])
+    (download-url
+     (string-append "https://back.nber.org/bibliographic/"
+                    "w" id ".bib"))))
+
 ;; Oxford University Press journals.  Example URL:
 ;;
 ;; https://academic.oup.com/qje/article-abstract/114/3/739/1848099?redirectedFrom=fulltext
@@ -228,10 +248,10 @@
     [else                      (get-initials journal)]))
 
 (define (bib->bib-id content)
-  (let ([match (regexp-match #rx"{([^,]+)," content)])
+  (let ([match (regexp-match #rx"(^|\n)@[a-z]+{([^,]+)," content)])
     (if (not match)
         (error 'bib->bib-id-parse-error)
-        (cadr match))))
+        (caddr match))))
 
 (define (build-bib-id content)
   (let* ([year (bib->year content)]
@@ -245,9 +265,9 @@
 
 (define (replace-bib-id content new-bib-id)
   (regexp-replace
-   #rx"{[^,]*,"
+   #rx"(^|\n)(@[a-z]+){[^,]*,"
    content
-   (string-append "{" new-bib-id ",")))
+   (string-append "\\1\\2{" new-bib-id ",")))
 
 (define (update-bib-id content)
   (replace-bib-id content
@@ -263,6 +283,7 @@
     [(aeaweb-url?      url) fetch-aeaweb]
     [(cambridgeup-url? url) fetch-cambridgeup]
     [(jstor-url?       url) fetch-jstor]
+    [(nber-url?        url) fetch-nber]
     [(oxfordup-url?    url) fetch-oxfordup]
     [else                   (error 'unrecognized-url)]))
 
