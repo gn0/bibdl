@@ -232,6 +232,16 @@
 (define (journal-jae? journal)
   (regexp-match-exact? #rx"(?i:journal of african economies)" journal))
 
+(define (journal-ajps? journal)
+  (regexp-match-exact?
+   #rx"(?i:(the )?american journal of political science)"
+   journal))
+
+(define (journal-apsr? journal)
+  (regexp-match-exact?
+   #rx"(?i:(the )?american political science review)"
+   journal))
+
 (define (journal->abbrev journal)
   (cond
     [(journal-qje?    journal) "qje"]
@@ -245,6 +255,8 @@
     [(journal-aejmic? journal) "aejmic"]
     [(journal-aejmac? journal) "aejmac"]
     [(journal-jae?    journal) "jae"]
+    [(journal-ajps?   journal) "ajps"]
+    [(journal-apsr?   journal) "apsr"]
     [else                      (get-initials journal)]))
 
 (define (bib->bib-id content)
